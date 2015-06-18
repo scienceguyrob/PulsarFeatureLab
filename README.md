@@ -59,7 +59,50 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
 	
 	Required Arguments
 	
-	Flag	Type		Description
+	<table>
+  <tr>
+    <th>Flag</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>−c</td>
+    <td>integer</td>
+    <td>Candidate file type.
+    <ol>
+    	<li>The Pulsar Hunter Candidate XML (PHCX) candidates output by the pipeline described by Morello et al.[6].</li>
+    	<li>The gnuzipped (‘.gz’) PHCX candidates produced by the pipeline described by Thornton [4].</li>
+    	<li>The prepfold (PFD) files output by the LOTAAS and similar surveys.</li>
+    </ol>
+    </td>
+  </tr>
+  <tr>
+    <td>−d</td>
+    <td>string</td>
+    <td>Integer Path to the directory containing candidates.</td>
+  </tr>
+  <tr>
+    <td>-f</td>
+    <td>string</td>
+    <td>Path to the output file to create or append to.</td>
+  </tr>
+  <tr>
+    <td>−t</td>
+    <td>integer</td>
+    <td>Type of features to generate.
+    <ol>
+    	<li>12 features from Eatough et al. [2].</li>
+    	<li>22 features from Bates et al. [3].</li>
+    	<li>22 features from Thornton. [4].</li>
+    	<li>6 features from Lee et al. [5].</li>
+    	<li>6 features from Morello et al. [6].</li>
+    	<li>8 features from Lyon et al. [1].</li>
+    	<li>Integrated (folded) profile data.</li>
+    	<li>DM-SNR Curve data.</li>
+    </ol>
+    </td>
+  </tr>
+</table>
 	
 	-c		integer 	Candidate file type.
 	
@@ -83,45 +126,29 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
 						8. DM-SNR Curve data.
 
 	Optional Arguments
-	
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#bbb;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#bbb;color:#594F4F;background-color:#E0FFEB;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#bbb;color:#493F3F;background-color:#9DE0AD;}
-.tg .tg-s6z2{text-align:center}
-</style>
 
-<table class="tg">
+<table>
   <tr>
-    <th class="tg-s6z2">Flag</th>
-    <th class="tg-s6z2">Type</th>
-    <th class="tg-s6z2">Description</th>
+    <th>Flag</th>
+    <th>Type</th>
+    <th>Description</th>
   </tr>
   <tr>
-    <td class="tg-s6z2">−−arff</td>
-    <td class="tg-s6z2">boolean</td>
-    <td class="tg-s6z2">Flag that when provided, writes feature output in the WEKA ARFF file format.</td>
+    <td>−−arff</td>
+    <td>boolean</td>
+    <td>Flag that when provided, writes feature output in the WEKA ARFF file format.</td>
   </tr>
   <tr>
-    <td class="tg-s6z2">−−meta</td>
-    <td class="tg-s6z2">boolean</td>
-    <td class="tg-s6z2">Flag that when provided, writes meta information, i.e. the candidate file name, to the output file.</td>
+    <td>−−meta</td>
+    <td>boolean</td>
+    <td>Flag that when provided, writes meta information, i.e. the candidate file name, to the output file.</td>
   </tr>
   <tr>
-    <td class="tg-s6z2">-v</td>
-    <td class="tg-s6z2">boolean</td>
-    <td class="tg-s6z2">Verbose debugging flag.</td>
+    <td>-v</td>
+    <td>boolean</td>
+    <td>Verbose debugging flag.</td>
   </tr>
 </table>
-
-	Flag	Type		Description
-	
-	−−arff	boolean		Flag that when provided, writes feature output in the WEKA ARFF file format.
-	
-	−−meta  boolean	Flag that when provided, writes meta information, i.e. the candidate file name,
-						to the output file.
-						
-	-v		boolean		Verbose debugging flag.
 	
 3. Citing our work
 
