@@ -84,11 +84,43 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
 
 	Optional Arguments
 	
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#bbb;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#bbb;color:#594F4F;background-color:#E0FFEB;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#bbb;color:#493F3F;background-color:#9DE0AD;}
+.tg .tg-s6z2{text-align:center}
+</style>
+
+<table class="tg">
+  <tr>
+    <th class="tg-s6z2">Flag</th>
+    <th class="tg-s6z2">Type</th>
+    <th class="tg-s6z2">Description</th>
+  </tr>
+  <tr>
+    <td class="tg-s6z2">−−arff</td>
+    <td class="tg-s6z2">boolean</td>
+    <td class="tg-s6z2">Flag that when provided, writes feature output in the WEKA ARFF file format.</td>
+  </tr>
+  <tr>
+    <td class="tg-s6z2">−−meta</td>
+    <td class="tg-s6z2">boolean</td>
+    <td class="tg-s6z2">Flag that when provided, writes meta information, i.e. the candidate file name, to the output file.</td>
+  </tr>
+  <tr>
+    <td class="tg-s6z2">-v</td>
+    <td class="tg-s6z2">boolean</td>
+    <td class="tg-s6z2">Verbose debugging flag.</td>
+  </tr>
+</table>
+
 	Flag	Type		Description
 	
 	−−arff	boolean		Flag that when provided, writes feature output in the WEKA ARFF file format.
-	−−meta  boolean		Flag that when provided, writes meta information, i.e. the candidate file name,
+	
+	−−meta  boolean	Flag that when provided, writes meta information, i.e. the candidate file name,
 						to the output file.
+						
 	-v		boolean		Verbose debugging flag.
 	
 3. Citing our work
