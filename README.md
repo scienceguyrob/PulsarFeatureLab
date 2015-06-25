@@ -151,8 +151,8 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
 6. References
 
 	[1] R. J. Lyon et al., "Fifty Years of Pulsar Candidate Selection: From simple filters to a new
-		principled real-time classification approach", Monthly Notices of the Royal Astronomical Society,
-		vol. 000, no. 0, pp. 0000–0000, 2015.
+		principled real-time classification approach", Submitted to Monthly Notices of the Royal 
+		Astronomical Society.
 		
 	[2] R. P. Eatough et al., "Selection of radio pulsar candidates using artificial neural networks",
 		Monthly Notices of the Royal Astronomical Society, vol. 407, no. 4, pp. 2443-2450, 2010.
