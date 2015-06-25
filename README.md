@@ -36,8 +36,8 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
 	If you use the code in your work please cite us using (or see bibtex below):
 	
 	R. J. Lyon, B. W. Stappers, S. Cooper, J. M. Brooke, J. D. Knowles, Fifty Years of Pulsar
-	Candidate Selection: From simple filters to a new principled real-time classification approach
-	MNRAS, 000, p.000-000, 2015.
+	Candidate Selection: From simple filters to a new principled real-time classification approach,
+	Submitted to MNRAS.
 
 2. Requirements
 
