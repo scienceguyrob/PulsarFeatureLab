@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<project name="Ant-Test" default="main" basedir=".">
+	<!-- 
+	
+	This is the ant build file for this project. It is used to automate the building,
+	and testing of the python scripts contained herein - it is really useful. If you don't
+	have ant / or have never heard of it, its probably worth looking at how it works. But for
+	now, if you install the Eclipse IDE with pydev to build this project, then ant should be
+	already installed for you. Simply run this script within Eclipse and you'll see building
+	and testing run automatically.
+	
+	Rob.
+	-->
+	
+	<!-- Sets variables used for testing and distributing. -->
+	<property name="Src.dir" location="Src" />
+	<property name="Resources.dir" location="Resources" />
+	<property name="Test.dir" location="Test" />
+	<property name="Dist.dir" location="Dist" />
+
+	<!-- Deletes the existing build and dist directories -->
+	<target name="clean">
+		<delete dir="${Dist.dir}" />
+		<delete dir="${Test.dir}" />
+	</target>
+
+	<!-- Creates the build and dist directories -->
+	<target name="makedir">
+		<mkdir dir="${Dist.dir}" />
+		<mkdir dir="${Test.dir}" />
+	</target>
+	
+	
+	<!-- 					   		   -->
+	<!-- 					   		   -->
+	<!-- PREPARE TESTS  			   -->
+	<!-- 					           -->
+	<!-- 					   		   -->
+	
+	<target name="copy" depends="clean, makedir">
+		
+		<!-- Copy code to the distribution directory. -->
+		<copy todir="${Dist.dir}" overwrite="true">
+			<fileset dir="${Src.dir}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		
+		<!-- Copy code to the test direcotry. -->
+		<copy todir="${Test.dir}" overwrite="true">
+		  <fileset dir="${Src.dir}">
+		    <include name="**/*" />
+		  </fileset>
+		</copy>
+		
+		<!-- Copy HTRU 1 data to the test directory. -->
+		<copy todir="${Test.dir}" overwrite="true">
+			<fileset dir="${Resources.dir}/Test/Candidates/HTRU_1">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		
+		<!-- Copy HTRU 2 data to the test directory. -->
+		<copy todir="${Test.dir}" overwrite="true">
+			<fileset dir="${Resources.dir}/Test/Candidates/HTRU_2">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		
+		<!-- Copy data to the test direcotry. -->
+		<copy todir="${Test.dir}" overwrite="true">
+			<fileset dir="${Resources.dir}/Test/Candidates/LOTAAS_1">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		
+	</target>
+	
+	<!-- 					   				-->
+	<!-- 					   				-->
+	<!-- 		EXECUTE THE TESTS  			-->
+	<!-- 					   				-->
+	<!-- Use this ection to test the run    -->
+	<!-- configurations on offer.           -->
+	
+	<!-- Executes score generation script on small sample data ONLY. -->
+	<target name="main_test" depends="copy">
+		<description>Main target</description>
+		
+		<!-- Run score generation script. -->
+		<exec dir="${Test.dir}" executable="python" failonerror="true">
+			<arg line="PulsarFeatureLab.py --arff -c 1 -t 6 -d ${Test.dir} -f ${Test.dir}/TestOutput.arff" />
+		</exec>
+				
+	</target>
+	
+	<!-- 					       -->
+	<!-- 					       -->
+	<!--   PRIMARY BUILD TARGET    -->
+	<!-- 					       -->
+	<!-- 					       -->
+	
+	<target name="main" depends="main_test" />
+	
+</project>
