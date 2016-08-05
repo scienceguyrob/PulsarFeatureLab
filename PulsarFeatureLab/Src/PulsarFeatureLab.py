@@ -1,7 +1,7 @@
 """
     **************************************************************************
     |                                                                        |
-    |                     Pulsar Feature Lab Version 1.0                     |
+    |                     Pulsar Feature Lab Version 1.2                     |
     |                                                                        |
     **************************************************************************
     | Description:                                                           |
@@ -33,7 +33,7 @@
     |    3 - 22 features from Thornton., PhD Thesis, Univ. Manchester, 2013. |
     |    4 - 6 features from  Lee et al., MNRAS 433, 1, 2013.                |
     |    5 - 6 features from Morello et al., MNRAS 443, 2, 2014.             |
-    |    6 - 8 features from Lyon et al., MNRAS, 000, 0, 2015.               |
+    |    6 - 20 features from Lyon et al., MNRAS, 000, 0, 2015               |
     |    7 - Raw integrated (folded) profile data.                           |
     |    8 - Raw DM-SNR Curve data.                                          |
     |                                                                        |
@@ -179,7 +179,7 @@ class PulsarFeatureLab:
 
         # Process -c argument if provided. 
         if(self.candidate_type is not 3):
-            print "(The script currently works with PFD files)"
+            print "(The script currently works with PFD files only.)"
             print "You must indicate the type of candidate file features will be extracted from with the -c flag."
             print "1    -    The PHCX candidates produced by pipeline described 'SPINN: a straightforward machine learning solution to the pulsar candidate selection problem', Morello et al., MNRAS 443, 2, 2014."
             print "2    -    The gnuzipped ('.gz') PHCX candidates produced by pipeline described in 'The High Time Resolution Radio Sky', Thornton., PhD Thesis, Univ. Manchester, 2013."

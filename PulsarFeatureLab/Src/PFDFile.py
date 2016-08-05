@@ -36,6 +36,7 @@ from numpy import fmod
 from numpy import sum
 from numpy import sqrt
 from numpy import std
+from numpy import arange
 
 # For plotting fits etc.
 import matplotlib.pyplot as plt
@@ -567,6 +568,116 @@ class PFD(Utilities.Utilities):
 
     # ******************************************************************************************
 
+    def adjust_period_get(self, p=None, pd=None, pdd=None, interp=0, DM=None):
+        """
+        adjust_period(p=*bestp*, pd=*bestpd*, pdd=*bestpdd*):
+            Rotate (internally) the profiles so that they are adjusted to
+                the given period and period derivatives.  By default,
+                use the 'best' values as determined by prepfold's seaqrch.
+                This should orient all of the profiles so that they are
+                almost identical to what you see in a prepfold plot which
+                used searching.  Use FFT-based interpolation if 'interp'
+                is non-zero.  (NOTE: It is off by default, as in prepfold!)
+        """
+        if DM is None:
+            DM = self.bestdm
+        subdelays_bins = self.subdelays_bins.copy()
+
+        # Note:  Since TEMPO pler corrects observing frequencies, for
+        #        TOAs, at least, we need to de-disperse using topocentric
+        #        observing frequencies.
+        subdelays = self.fe.delay_from_DM(DM, self.barysubfreqs)
+        hifreqdelay = subdelays[-1]
+        subdelays = subdelays - hifreqdelay
+        delaybins = subdelays * self.binspersec - subdelays_bins
+
+        if interp:
+
+            new_subdelays_bins = delaybins
+
+            for ii in range(self.npart):
+                for jj in range(self.nsub):
+                    tmp_prof = self.profs[ii, jj, :]
+                    self.profs[ii, jj] = self.fe.fft_rotate(tmp_prof, delaybins[jj])
+
+            # Note: Since the rotation process slightly changes the values of the
+            # profs, we need to re-calculate the average profile value
+            self.avgprof = (self.profs / self.proflen).sum()
+
+        else:
+
+            new_subdelays_bins = floor(delaybins + 0.5)
+
+            for ii in range(self.nsub):
+
+                rotbins = int(new_subdelays_bins[ii]) % self.proflen
+                if rotbins:  # i.e. if not zero
+                    subdata = self.profs[:, ii, :]
+                    self.profs[:, ii] = concatenate((subdata[:, rotbins:], subdata[:, :rotbins]), 1)
+
+        self.subdelays_bins += new_subdelays_bins
+
+        if self.fold_pow == 1.0:
+            bestp = self.bary_p1
+            bestpd = self.bary_p2
+            bestpdd = self.bary_p3
+        else:
+            bestp = self.topo_p1
+            bestpd = self.topo_p2
+            bestpdd = self.topo_p3
+        if p is None:
+            p = bestp
+        if pd is None:
+            pd = bestpd
+        if pdd is None:
+            pdd = bestpdd
+
+        # Cast to single precision and back to double precision to
+        # emulate prepfold_plot.c, where parttimes is of type "float"
+        # but values are upcast to "double" during computations.
+        # (surprisingly, it affects the resulting profile occasionally.)
+        parttimes = self.start_secs.astype('float32').astype('float64')
+
+        # Get delays
+        f_diff, fd_diff, fdd_diff = self.freq_offsets(p, pd, pdd)
+        delays = self.fe.delay_from_foffsets(f_diff, fd_diff, fdd_diff, parttimes)
+
+        # Convert from delays in phase to delays in bins
+        bin_delays = fmod(delays * self.proflen, self.proflen) - self.pdelays_bins
+        if interp:
+            new_pdelays_bins = bin_delays
+        else:
+            new_pdelays_bins = floor(bin_delays + 0.5)
+
+        # Rotate subintegrations
+        for ii in range(self.nsub):
+            for jj in range(self.npart):
+                tmp_prof = self.profs[jj, ii, :]
+                # Negative sign in num bins to shift because we calculated delays
+                # Assuming +ve is shift-to-right, psr_utils.rotate assumes +ve
+                # is shift-to-left
+                if interp:
+                    self.profs[jj, ii] = self.fe.fft_rotate(tmp_prof, -new_pdelays_bins[jj])
+                else:
+                    self.profs[jj, ii] = self.fe.rotate(tmp_prof, -new_pdelays_bins[jj])
+        self.pdelays_bins += new_pdelays_bins
+        if interp:
+            # Note: Since the rotation process slightly changes the values of the
+            # profs, we need to re-calculate the average profile value
+            self.avgprof = (self.profs / self.proflen).sum()
+
+        self.sumprof = self.profs.sum(0)
+        self.sumints = self.profs.sum(1)
+
+        if fabs((self.sumprof / self.proflen).sum() - self.avgprof) > 1.0:
+            print "self.avgprof is not the correct value!"
+
+        # Save current p, pd, pdd
+        self.curr_p1, self.curr_p2, self.curr_p3 = p, pd, pdd
+        return (self.sumprof, self.sumints)
+
+        # ****************************************************************************************************
+
     def plot_chi2_vs_period(self):
         """
         Plot and return an array showing the reduced chi^2 against period
@@ -616,7 +727,7 @@ class PFD(Utilities.Utilities):
     
     # ******************************************************************************************
     
-    def plot_subbands(self):
+    def plot_subbands(self, dm=None, interp=0):
         """
         Plot the interval-summed profiles vs subband.  Restrict the bins
         in the plot to the (low:high) slice defined by the phasebins option
@@ -626,10 +737,21 @@ class PFD(Utilities.Utilities):
             self.dedisperse()
         
         lo, hi = 0.0, self.proflen
-        profs = self.profs.sum(0)
+        profs, empty = self.adjust_period_get(DM=dm)
         lof = self.lofreq - 0.5*self.chan_wid
         hif = lof + self.chan_wid*self.numchan
         
+        return profs
+
+    def plot_subints(self, dm=None, interp=0):
+        """
+        Plot the interval-summed profiles vs subint.  Restrict the bins
+        in the plot to the (low:high) slice defined by the phasebins option
+        if it is a tuple (low,high) instead of the string 'All'.
+        """
+
+        empty, profs = self.adjust_period_get(DM=dm)
+
         return profs
                         
     # ****************************************************************************************************
@@ -1073,19 +1195,21 @@ class PFD(Utilities.Utilities):
             self.features.append(skw)
             self.features.append(kurt)
 
-            # Now compute Period-SNR curve stats.
-            chisp,periods = self.plot_chi2_vs_period()
+            # subbands data
+            subbands = self.plot_subbands()
+            profile = subbands.sum(0)
+            corrlist = self.fe.subband_correlation(subbands,profile)
 
-            mn = mean(chisp)
-            stdev = std(chisp)
-            skw = self.fe.skewness(chisp)
-            kurt = self.fe.excess_kurtosis(chisp)
+            mn = mean(corrlist)
+            stdev = std(corrlist)
+            skw = self.fe.skewness(corrlist)
+            kurt = self.fe.excess_kurtosis(corrlist)
 
             if(self.debug==True):
-                print "\nFeature 9. Mean of the period chi2 plot = ",             str(mn)
-                print "Feature 10. Standard deviation of the period chi2 plot = ",str(stdev)
-                print "Feature 11. Skewness of the period chi2 plot = ",          str(skw)
-                print "Feature 12. Excess Kurtosis of the period chi2 plot = ",   str(kurt)
+                print "\nFeature 9. Mean of the correlation coefficient between each subband and the profile = ",             str(mn)
+                print "Feature 10. Standard deviation of the correlation coefficient between each subband and the profile = ",str(stdev)
+                print "Feature 11. Skewness of the correlation coefficient between each subband and the profile = ",          str(skw)
+                print "Feature 12. Excess Kurtosis of the correlation coefficient between each subband and the profile = ",   str(kurt)
 
             self.features.append(mn)
             self.features.append(stdev)
@@ -1094,28 +1218,54 @@ class PFD(Utilities.Utilities):
 
             # Now compute Pdot-SNR curve stats.
             chispd,pdots = self.plot_chi2_vs_pdot()
+            subints = self.plot_subints()
+            profile = subints.sum(0)
+            corrlist = self.fe.subint_correlation(subints, profile)
 
-            mn = mean(chispd)
-            stdev = std(chispd)
-            skw = self.fe.skewness(chispd)
-            kurt = self.fe.excess_kurtosis(chispd)
+            mn = mean(corrlist)
+            stdev = std(corrlist)
+            skw = self.fe.skewness(corrlist)
+            kurt = self.fe.excess_kurtosis(corrlist)
 
             if(self.debug==True):
-                print "\nFeature 13. Mean of the pdot chi2 plot = ",             str(mn)
-                print "Feature 14. Standard deviation of the pdot chi2 plot = ",str(stdev)
-                print "Feature 15. Skewness of the pdot chi2 plot = ",          str(skw)
-                print "Feature 16. Excess Kurtosis of the pdot chi2 plot = ",   str(kurt)
+                print "\nFeature 13. Mean of the correlation coefficient between each subint and the profile = ",             str(mn)
+                print "Feature 14. Standard deviation of the correlation coefficient between each subint and the profile = ",str(stdev)
+                print "Feature 15. Skewness of the correlation coefficient between each subint and the profile = ",          str(skw)
+                print "Feature 16. Excess Kurtosis of the correlation coefficient between each subint and the profile = ",   str(kurt)
 
             self.features.append(mn)
             self.features.append(stdev)
             self.features.append(skw)
             self.features.append(kurt)
+
+            # try getting shape of DM curve
+            chi2 = self.fe.getDMCurveData(self)
+            DMsize = arange(len(chi2))
+            shapemn = sum([x * y for x, y in zip(chi2, DMsize)]) / sum(chi2)
+            DMminusmn = DMsize - shapemn
+            shapevr = sum([x * y for x, y in zip(chi2, DMminusmn ** 2)]) / sum(chi2)
+            shapesd = sqrt(shapevr)
+            shapeskw = abs((sum([x * y for x, y in zip(chi2, DMminusmn ** 3)]) / sum(chi2)) / shapevr ** 1.5)
+            shapekurt = ((sum([x * y for x, y in zip(chi2, DMminusmn ** 4)]) / sum(chi2)) / shapevr ** 2) - 3
+
+            if(self.debug==True):
+                print "\nFeature 17. Mean of the shape of DM-Chi2 plot = ",            str(shapemn)
+                print "Feature 18. Standard deviation of the shape of DM-Chi2 plot = ",str(shapesd)
+                print "Feature 19. Skewness of the shape of DM-Chi2 plot = ",          str(shapeskw)
+                print "Feature 20. Excess Kurtosis of the shape of DM-Chi2 plot = ",   str(shapekurt)
+
+
+            self.features.append(shapemn)
+            self.features.append(shapesd)
+            self.features.append(shapeskw)
+            self.features.append(shapekurt)
             
         except Exception as e: # catch *all* exceptions
             print "Error getting features from PFD file\n\t", sys.exc_info()[0]
             print self.format_exception(e)
             raise Exception("Exception computing 8 features from Lyon et al.,2015 + "
-                            "8 features from the period-chi2 and pdot-chi2 plots.")
+                            "8 features from the correlation coefficient between subbands and subints with pulse profile + "
+                            "4 new features from the DM-Chi2 plot")
         
         return self.features
 

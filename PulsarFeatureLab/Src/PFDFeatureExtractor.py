@@ -435,7 +435,84 @@ class PFDFeatureExtractor(FeatureExtractor):
                 corrlist.append(coef[0][1])
         
         return array(corrlist)
-     
+
+    # ******************************************************************************************
+
+    def subband_correlation(self,subbands,profile):
+        """
+        Calculates the correlation coefficient of each subband and the pulse profile.
+
+        Parameters:
+        subbands - the subband data
+        profile - the pulse profile
+
+        Returns:
+
+        A list of correlation coefficient of each subband and the pulse profile
+        """
+        corrlist1 = []
+        maxmin1 = []
+
+
+        # scrunch subband from 288 to 36 (LOTAAS specific data)
+        scrunchsubbands = []
+        if len(subbands) == 288:
+            for j in range(36):
+                scrunchsubbands.append(
+                    subbands[(j * 8) + 0] + subbands[(j * 8) + 1] + subbands[(j * 8) + 2] + subbands[(j * 8) + 3] +
+                    subbands[(j * 8) + 4] + subbands[(j * 8) + 5] + subbands[(j * 8) + 6] + subbands[(j * 8) + 7])
+            subbands = scrunchsubbands
+
+        # remove empty subbands and calculate the coefficients
+        for j in range(len(subbands)):
+            maxmin1.append(max(subbands[j]) - min(subbands[j]))
+
+        maxchange1 = max(maxmin1)
+
+        for j in range(len(subbands)):
+            if max(subbands[j]) - min(subbands[j]) > 0.05 * maxchange1:
+                coef1 = abs(corrcoef(subbands[j], profile))
+                corrlist1.append(coef1[0][1])
+
+        return corrlist1
+
+    # ******************************************************************************************
+
+    def subint_correlation(self,subints,profile):
+        """
+        Calculates the correlation coefficient of each subint and the pulse profile.
+
+        Parameters:
+        subints - the subint data
+        profile - the pulse profile
+
+        Returns:
+
+        A list of correlation coefficient of each subint and the pulse profile
+        """
+        corrlist2 = []
+        maxmin2 = []
+
+        # scrunch subints so that its consistent
+        scrunchsubints = []
+        if len(subints) == 120:
+            for j in range(40):
+                scrunchsubints.append(subints[(j * 3) + 0] + subints[(j * 3) + 1] + subints[(j * 3) + 2])
+            subints = scrunchsubints
+
+        # remove empty subints
+        for j in range(len(subints)):
+            maxmin2.append(max(subints[j]) - min(subints[j]))
+
+        maxchange2 = max(maxmin2)
+
+        for j in range(len(subints)):
+            if max(subints[j]) - min(subints[j]) > 0.05 * maxchange2:
+                coef2 = abs(corrcoef(subints[j], profile))
+                corrlist2.append(coef2[0][1])
+
+        return corrlist2
+
     # ****************************************************************************************************
     #
     # Other Utility Functions
