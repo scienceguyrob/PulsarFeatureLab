@@ -159,7 +159,7 @@ class PulsarFeatureLab:
             
             # Now check again if it exists.
             if(not utils.fileExists(self.out)):
-                print "You must supply a valid output file path with the -d flag."
+                print "You must supply a valid output file path with the -f flag."
                 sys.exit()
                 
             
@@ -176,15 +176,18 @@ class PulsarFeatureLab:
             print "8    -    Raw data from the DM-SNR curve ."
             
             sys.exit()
-        
+
         # Process -c argument if provided. 
-        if(self.candidate_type < 1 or self.candidate_type > 3):
+        if(self.candidate_type is not 3):
+            print "(The script currently works with PFD files)"
             print "You must indicate the type of candidate file features will be extracted from with the -c flag."
             print "1    -    The PHCX candidates produced by pipeline described 'SPINN: a straightforward machine learning solution to the pulsar candidate selection problem', Morello et al., MNRAS 443, 2, 2014."
             print "2    -    The gnuzipped ('.gz') PHCX candidates produced by pipeline described in 'The High Time Resolution Radio Sky', Thornton., PhD Thesis, Univ. Manchester, 2013."
             print "3    -    The PFD files output by the LOTAAS and similar surveys (presto PFD format)."
             
             sys.exit()
+
+        self.candidate_type = 3
         
         # Process --arff argument if provided.
         if(self.arff == True):
@@ -255,7 +258,7 @@ class PulsarFeatureLab:
                 for count in range(1,7):
                     utils.appendToFile(self.out, "@attribute Feature_"+ str(count)+" numeric\n")
             elif(self.feature_type == 6):
-                for count in range(1,9):
+                for count in range(1,17):
                     utils.appendToFile(self.out, "@attribute Feature_"+ str(count)+" numeric\n")
             elif(self.feature_type == 7 or self.feature_type == 8):
                 print "\t NOTE:"

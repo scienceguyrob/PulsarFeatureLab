@@ -413,6 +413,42 @@ class PFD(Utilities.Utilities):
         return (chis, DMs)
     
     # ******************************************************************************************
+
+    # ******************************************************************************************
+
+    def plot_chi2_vs_period(self):
+        """
+        Plot and return an array showing the reduced chi^2 against period
+        """
+
+        periods = self.periods
+        chis = zeros(len(periods), dtype='f')
+        avgprof = self.avgprof
+
+        for ii in range(len(periods)):
+            sumprofs = self.adjust_period(p=periods[ii])
+            sumprofs = sumprofs.sum(0)
+            chis[ii] = self.calc_redchi2(prof=sumprofs, avg=avgprof)
+        return (chis, periods)
+
+    # ******************************************************************************************
+
+    def plot_chi2_vs_pdot(self):
+        """
+        Plot and return an array showing the reduced chi^2 against period
+        """
+
+        pdots = self.pdots
+        chis = zeros(len(pdots), dtype='f')
+        avgprof = self.avgprof
+
+        for ii in range(len(pdots)):
+            sumprofs = self.adjust_period(pd=pdots[ii])
+            sumprofs = sumprofs.sum(0)
+            chis[ii] = self.calc_redchi2(prof=sumprofs, avg=avgprof)
+        return (chis, pdots)
+
+    # ******************************************************************************************
     
     def calc_redchi2(self, prof=None, avg=None, var=None):
         """
@@ -816,7 +852,7 @@ class PFD(Utilities.Utilities):
     
     def computeType_6(self):
         """
-        Generates 8 features from Lyon et al.,2015.
+        Generates 8 features from Lyon et al.,2015 + 8 features from the period-chi2 and pdot-chi2 plots.
         
         Feature 1. Mean of the integrated (folded) pulse profile.
         Feature 2. Standard deviation of the integrated (folded) pulse profile.
@@ -826,6 +862,14 @@ class PFD(Utilities.Utilities):
         Feature 6. Standard deviation of the DM-SNR curve.
         Feature 7. Skewness of the DM-SNR curve.
         Feature 8. Excess kurtosis of the DM-SNR curve.
+        Feature 9. Mean of the period chi2 plot.
+        Feature 10. Standard deviation of the period-chi2 plot.
+        Feature 11. Skewness of the period-chi2 plot.
+        Feature 12. Excess kurtosis of the period-chi2 plot.
+        Feature 13. Mean of the pdot-chi2 plot.
+        Feature 14. Standard deviation of the pdot-chi2 plot.
+        Feature 15. Skewness of the pdot-chi2 plot.
+        Feature 16. Excess kurtosis of the pdot-chi2 plot.
         
         Parameters:
         N/A
@@ -875,12 +919,51 @@ class PFD(Utilities.Utilities):
             self.features.append(mn)
             self.features.append(stdev)
             self.features.append(skw)
-            self.features.append(kurt) 
+            self.features.append(kurt)
+
+            # Now compute Period-SNR curve stats.
+            chisp,periods = self.plot_chi2_vs_period()
+
+            mn = mean(chisp)
+            stdev = std(chisp)
+            skw = self.fe.skewness(chisp)
+            kurt = self.fe.excess_kurtosis(chisp)
+
+            if(self.debug==True):
+                print "\nFeature 9. Mean of the period chi2 plot = ",             str(mn)
+                print "Feature 10. Standard deviation of the period chi2 plot = ",str(stdev)
+                print "Feature 11. Skewness of the period chi2 plot = ",          str(skw)
+                print "Feature 12. Excess Kurtosis of the period chi2 plot = ",   str(kurt)
+
+            self.features.append(mn)
+            self.features.append(stdev)
+            self.features.append(skw)
+            self.features.append(kurt)
+
+            # Now compute Pdot-SNR curve stats.
+            chispd,pdots = self.plot_chi2_vs_pdot()
+
+            mn = mean(chispd)
+            stdev = std(chispd)
+            skw = self.fe.skewness(chispd)
+            kurt = self.fe.excess_kurtosis(chispd)
+
+            if(self.debug==True):
+                print "\nFeature 13. Mean of the pdot chi2 plot = ",             str(mn)
+                print "Feature 14. Standard deviation of the pdot chi2 plot = ",str(stdev)
+                print "Feature 15. Skewness of the pdot chi2 plot = ",          str(skw)
+                print "Feature 16. Excess Kurtosis of the pdot chi2 plot = ",   str(kurt)
+
+            self.features.append(mn)
+            self.features.append(stdev)
+            self.features.append(skw)
+            self.features.append(kurt)
             
         except Exception as e: # catch *all* exceptions
             print "Error getting features from PFD file\n\t", sys.exc_info()[0]
             print self.format_exception(e)
-            raise Exception("Exception computing 8 features from Lyon et al.,2015.")
+            raise Exception("Exception computing 8 features from Lyon et al.,2015 + "
+                            "8 features from the period-chi2 and pdot-chi2 plots.")
         
         return self.features
 
