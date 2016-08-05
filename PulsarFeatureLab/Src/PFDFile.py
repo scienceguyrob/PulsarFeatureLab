@@ -379,7 +379,8 @@ class PFD(Utilities.Utilities):
         """
 
         # Sum the profiles in time
-        sumprofs = self.profs.sum(0)
+        #sumprofs = self.profs.sum(0)
+        sumprofs, empty = self.adjust_period_get() #corrected for P and Pdot
         
         if not interp:
             profs = sumprofs
@@ -676,7 +677,7 @@ class PFD(Utilities.Utilities):
         self.curr_p1, self.curr_p2, self.curr_p3 = p, pd, pdd
         return (self.sumprof, self.sumints)
 
-        # ****************************************************************************************************
+    # ****************************************************************************************************
 
     def plot_chi2_vs_period(self):
         """

@@ -225,7 +225,7 @@ class PulsarFeatureLab:
             @attribute Feature_6 numeric
             @attribute Feature_7 numeric
             @attribute Feature_8 numeric
-            @attribute class {0,1}
+            @attribute class {0,1,2}
 
             @data
             8,5,2,1,1,2,3,1,? % This is a comment. Here ? is the unknown label.
@@ -270,7 +270,7 @@ class PulsarFeatureLab:
             # Add class label information to the ARFF file, for those features we can
             # produce an ARFF file for.    
             if(self.feature_type > 0 and self.feature_type < 7):
-                utils.appendToFile(self.out, "@attribute class {0,1}\n@data\n")
+                utils.appendToFile(self.out, "@attribute class {0,1,2}\n@data\n")
             
         # ****************************************
         #   Print command line arguments & Run
