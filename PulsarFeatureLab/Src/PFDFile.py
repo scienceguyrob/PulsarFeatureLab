@@ -638,8 +638,7 @@ class PFD(Utilities.Utilities):
                 if interp:
                     self.profs[jj, ii] = self.fe.fft_rotate(tmp_prof, -new_pdelays_bins[jj])
                 else:
-                    self.profs[jj, ii] = self.fe.rotate(tmp_prof, \
-                                                        -new_pdelays_bins[jj])
+                    self.profs[jj, ii] = self.fe.rotate(tmp_prof, -new_pdelays_bins[jj])
         self.pdelays_bins += new_pdelays_bins
         if interp:
             # Note: Since the rotation process slightly changes the values of the
@@ -1346,7 +1345,7 @@ class PFD(Utilities.Utilities):
             self.features.append(skw)
             self.features.append(kurt)
 
-            # Now compute Pdot-SNR curve stats.
+            #Subint data.
             subints = self.plot_subints(dm=DMs[argmax(SNRs)])
             profile = subints.sum(0)
             corrlist = self.fe.subint_correlation(subints, profile)
