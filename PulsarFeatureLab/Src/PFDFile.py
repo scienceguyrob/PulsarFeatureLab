@@ -384,7 +384,8 @@ class PFD(Utilities.Utilities):
         """
 
         #Sum the profiles in time
-        sumprofs = self.profs.sum(0)
+        #sumprofs = self.profs.sum(0)
+        sumprofs, empty = self.adjust_period_get() #corrected for P and Pdot
 
         
         if not interp:
@@ -1195,8 +1196,10 @@ class PFD(Utilities.Utilities):
             # First compute profile stats.
             bins = [] 
             
-            for intensity in self.getprofile():# call to self.getprofile() returns profile scaled within the range [0,255].
-                bins.append(float(intensity))
+            #for intensity in self.getprofile():# call to self.getprofile() returns profile scaled within the range [0,255].
+            #    bins.append(float(intensity))
+            subbands = self.plot_subbands() #Profiles corrected for P and Pdot
+            bins = self.scale(subbands.sum(0))
 
             
             mn = mean(bins)
