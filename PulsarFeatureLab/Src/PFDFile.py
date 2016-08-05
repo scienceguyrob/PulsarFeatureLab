@@ -1347,7 +1347,6 @@ class PFD(Utilities.Utilities):
             self.features.append(kurt)
 
             # Now compute Pdot-SNR curve stats.
-            #chispd,pdots = self.plot_chi2_vs_pdot()
             subints = self.plot_subints(dm=DMs[argmax(SNRs)])
             profile = subints.sum(0)
             corrlist = self.fe.subint_correlation(subints, profile)
