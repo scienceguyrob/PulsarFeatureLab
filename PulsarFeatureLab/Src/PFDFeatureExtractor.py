@@ -468,7 +468,20 @@ class PFDFeatureExtractor(FeatureExtractor):
         arr = asarray(arr)
         freqs = arange(arr.size/2+1, dtype=Num.float)
         phasor = exp(complex(0.0, (2.0*pi)) * freqs * bins / float(arr.size))
-        return Num.fft.irfft(phasor * Num.fft.rfft(arr))       
+        return Num.fft.irfft(phasor * Num.fft.rfft(arr))
+
+    # ****************************************************************************************************
+
+    def delay_from_foffsets(self, df, dfd, dfdd, times):
+        """
+        Return the delays in phase caused by offsets in
+        frequency (df), and two frequency derivatives (dfd, dfdd)
+        at the given times in seconds.
+        """
+        f_delays = df * times
+        fd_delays = dfd * times ** 2 / 2.0
+        fdd_delays = dfdd * times ** 3 / 6.0
+        return (f_delays + fd_delays + fdd_delays)
     
     # ****************************************************************************************************
     

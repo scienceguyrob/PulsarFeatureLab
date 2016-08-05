@@ -32,6 +32,7 @@ from numpy import add
 from numpy import mean
 from numpy import zeros
 from numpy import shape
+from numpy import fmod
 from numpy import sum
 from numpy import sqrt
 from numpy import std
@@ -146,8 +147,13 @@ class PFD(Utilities.Utilities):
         (self.fold_pow, tmp) = struct.unpack(swapchar+"f"*2, infile.read(2*4))
         (self.fold_p1, self.fold_p2, self.fold_p3) = struct.unpack(swapchar+"d"*3,infile.read(3*8))
         (self.orb_p, self.orb_e, self.orb_x, self.orb_w, self.orb_t, self.orb_pd,self.orb_wd) = struct.unpack(swapchar+"d"*7, infile.read(7*8))
+
+        self.curr_p1, self.curr_p2, self.curr_p3 = self.p_to_f(self.fold_p1, self.fold_p2, self.fold_p3)
+
+        self.pdelays_bins = zeros(self.npart, dtype='d')
         self.dms = asarray(struct.unpack(swapchar+"d"*self.numdms,infile.read(self.numdms*8)))
-        
+
+
         if self.numdms==1:
             self.dms = self.dms[0]
             
@@ -411,8 +417,153 @@ class PFD(Utilities.Utilities):
             chis[ii] = self.calc_redchi2(prof=sumprof, avg=avgprof)
 
         return (chis, DMs)
+
+    # ****************************************************************************************************
+
+    def p_to_f(self, p, pd, pdd=None):
+        """
+        p_to_f(p, pd, pdd=None):
+        Convert period, period derivative and period second
+        derivative to the equivalent frequency counterparts.
+        Will also convert from f to p.
+        """
+        f = 1.0 / p
+        fd = -pd / (p * p)
+        if (pdd == None):
+            return [f, fd]
+        else:
+            if (pdd == 0.0):
+                fdd = 0.0
+            else:
+                fdd = 2.0 * pd * pd / (p ** 3.0) - pdd / (p * p)
+            return [f, fd, fdd]
+
+    # ****************************************************************************************************
+
+    def freq_offsets(self, p=None, pd=None, pdd=None):
+        """
+        freq_offsets(p=*bestp*, pd=*bestpd*, pdd=*bestpdd*):
+            Return the offsets between given frequencies
+            and fold frequencies.
+
+            If p, pd or pdd are None use the best values.
+
+            A 3-tuple is returned.
+        """
+        if self.fold_pow == 1.0:
+            bestp = self.bary_p1
+            bestpd = self.bary_p2
+            bestpdd = self.bary_p3
+        else:
+            if self.topo_p1 == 0.0:
+                bestp = self.fold_p1
+                bestpd = self.fold_p2
+                bestpdd = self.fold_p3
+            else:
+                bestp = self.topo_p1
+                bestpd = self.topo_p2
+                bestpdd = self.topo_p3
+        if p is not None:
+            bestp = p
+        if pd is not None:
+            bestpd = pd
+        if pdd is not None:
+            bestpdd = pdd
+
+        # self.fold_p[123] are actually frequencies, convert to periods
+        foldf, foldfd, foldfdd = self.fold_p1, self.fold_p2, self.fold_p3
+        foldp, foldpd, foldpdd = self.p_to_f(foldf, foldfd, foldfdd)
+
+        # Get best f, fd, fdd
+        # Use folding values to be consistent with prepfold_plot.c
+        bestfdd = self.p_to_f(foldp, foldpd, bestpdd)[2]
+        bestfd = self.p_to_f(foldp, bestpd)[1]
+        bestf = 1.0 / bestp
+
+        # Get frequency and frequency derivative offsets
+        f_diff = bestf - foldf
+        fd_diff = bestfd - foldfd
+
+        # bestpdd=0.0 only if there was no searching over pdd
+        if bestpdd != 0.0:
+            fdd_diff = bestfdd - foldfdd
+        else:
+            fdd_diff = 0.0
+
+        return (f_diff, fd_diff, fdd_diff)
     
     # ******************************************************************************************
+
+    def adjust_period(self, p=None, pd=None, pdd=None, interp=0):
+        """
+        adjust_period(p=*bestp*, pd=*bestpd*, pdd=*bestpdd*):
+            Rotate (internally) the profiles so that they are adjusted to
+                the given period and period derivatives.  By default,
+                use the 'best' values as determined by prepfold's seaqrch.
+                This should orient all of the profiles so that they are
+                almost identical to what you see in a prepfold plot which
+                used searching.  Use FFT-based interpolation if 'interp'
+                is non-zero.  (NOTE: It is off by default, as in prepfold!)
+        """
+        if self.fold_pow == 1.0:
+            bestp = self.bary_p1
+            bestpd = self.bary_p2
+            bestpdd = self.bary_p3
+        else:
+            bestp = self.topo_p1
+            bestpd = self.topo_p2
+            bestpdd = self.topo_p3
+        if p is None:
+            p = bestp
+        if pd is None:
+            pd = bestpd
+        if pdd is None:
+            pdd = bestpdd
+
+        # Cast to single precision and back to double precision to
+        # emulate prepfold_plot.c, where parttimes is of type "float"
+        # but values are upcast to "double" during computations.
+        # (surprisingly, it affects the resulting profile occasionally.)
+        parttimes = self.start_secs.astype('float32').astype('float64')
+
+        # Get delays
+        f_diff, fd_diff, fdd_diff = self.freq_offsets(p, pd, pdd)
+        delays = self.fe.delay_from_foffsets(f_diff, fd_diff, fdd_diff, parttimes)
+
+        # Convert from delays in phase to delays in bins
+        bin_delays = fmod(delays * self.proflen, self.proflen) - self.pdelays_bins
+        if interp:
+            new_pdelays_bins = bin_delays
+        else:
+            new_pdelays_bins = floor(bin_delays + 0.5)
+
+        # Rotate subintegrations
+        for ii in range(self.nsub):
+            for jj in range(self.npart):
+                tmp_prof = self.profs[jj, ii, :]
+                # Negative sign in num bins to shift because we calculated delays
+                # Assuming +ve is shift-to-right, psr_utils.rotate assumes +ve
+                # is shift-to-left
+                if interp:
+                    self.profs[jj, ii] = self.fe.fft_rotate(tmp_prof, -new_pdelays_bins[jj])
+                else:
+                    self.profs[jj, ii] = self.fe.rotate(tmp_prof, \
+                                                        -new_pdelays_bins[jj])
+        self.pdelays_bins += new_pdelays_bins
+        if interp:
+            # Note: Since the rotation process slightly changes the values of the
+            # profs, we need to re-calculate the average profile value
+            self.avgprof = (self.profs / self.proflen).sum()
+
+        self.profile = self.profs.sum(0)
+
+        if fabs((self.sumprof / self.proflen).sum() - self.avgprof) > 1.0:
+            print "self.avgprof is not the correct value!"
+
+        # Save current p, pd, pdd
+        self.curr_p1, self.curr_p2, self.curr_p3 = p, pd, pdd
+
+        return self.profile
 
     # ******************************************************************************************
 
@@ -888,7 +1039,8 @@ class PFD(Utilities.Utilities):
             mn = mean(bins)
             stdev = std(bins)
             skw = self.fe.skewness(bins)         
-            kurt = self.fe.excess_kurtosis(bins) 
+            kurt = self.fe.excess_kurtosis(bins)
+
             
             if(self.debug==True):
                 print "\nFeature 1. Mean of the integrated (folded) pulse profile = ",            str(mn)
@@ -982,6 +1134,7 @@ class PFD(Utilities.Utilities):
         
         for intensity in self.profile:
             self.features.append(float(intensity))
+
             
         return self.features
         
