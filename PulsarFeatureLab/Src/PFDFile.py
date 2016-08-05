@@ -378,9 +378,9 @@ class PFD(Utilities.Utilities):
         (N DMs spanning loDM-hiDM). Use sinc_interpolation if 'interp' is non-zero.
         """
 
-        # Sum the profiles in time
-        #sumprofs = self.profs.sum(0)
-        sumprofs, empty = self.adjust_period_get() #corrected for P and Pdot
+        #Sum the profiles in time
+        sumprofs = self.profs.sum(0)
+
         
         if not interp:
             profs = sumprofs
@@ -1160,10 +1160,9 @@ class PFD(Utilities.Utilities):
             # First compute profile stats.
             bins = [] 
             
-            #for intensity in self.getprofile():# call to self.getprofile() returns profile scaled within the range [0,255].
-            #    bins.append(float(intensity))
-            subbands = self.plot_subbands() #Profiles corrected for P and Pdot
-            bins = self.scale(subbands.sum(0))
+            for intensity in self.getprofile():# call to self.getprofile() returns profile scaled within the range [0,255].
+                bins.append(float(intensity))
+
             
             mn = mean(bins)
             stdev = std(bins)
