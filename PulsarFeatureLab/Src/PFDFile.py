@@ -1132,18 +1132,22 @@ class PFD(Utilities.Utilities):
         Feature 2. Standard deviation of the integrated (folded) pulse profile.
         Feature 3. Skewness of the integrated (folded) pulse profile.
         Feature 4. Excess kurtosis of the integrated (folded) pulse profile.
-        Feature 5. Mean of the DM-SNR curve.
-        Feature 6. Standard deviation of the DM-SNR curve.
-        Feature 7. Skewness of the DM-SNR curve.
-        Feature 8. Excess kurtosis of the DM-SNR curve.
-        Feature 9. Mean of the period chi2 plot.
-        Feature 10. Standard deviation of the period-chi2 plot.
-        Feature 11. Skewness of the period-chi2 plot.
-        Feature 12. Excess kurtosis of the period-chi2 plot.
-        Feature 13. Mean of the pdot-chi2 plot.
-        Feature 14. Standard deviation of the pdot-chi2 plot.
-        Feature 15. Skewness of the pdot-chi2 plot.
-        Feature 16. Excess kurtosis of the pdot-chi2 plot.
+        Feature 5. Mean of the DM-chi2 curve.
+        Feature 6. Standard deviation of the DM-chi2 curve.
+        Feature 7. Skewness of the DM-chi2 curve.
+        Feature 8. Excess kurtosis of the DM-chi2 curve.
+        Feature 9. Mean of the correlation coefficient between each subband and pulse profile.
+        Feature 10. Standard deviation of the correlation coefficient between each subband and pulse profile.
+        Feature 11. Skewness of the correlation coefficient between each subband and pulse profile.
+        Feature 12. Excess kurtosis of the correlation coefficient between each subband and pulse profile.
+        Feature 13. Mean of the correlation coefficient between each subband and pulse profile.
+        Feature 14. Standard deviation of the correlation coefficient between each subband and pulse profile.
+        Feature 15. Skewness of the correlation coefficient between each subband and pulse profile.
+        Feature 16. Excess kurtosis of the correlation coefficient between each subband and pulse profile.
+        Feature 17. Mean of the shape of the DM-chi2 curve.
+        Feature 18. Standard deviation of the shape of the DM-chi2 curve.
+        Feature 19. Skewness of the shape of the DM-chi2 curve.
+        Feature 20. Excess kurtosis of the shape of the DM-chi2 curve.
         
         Parameters:
         N/A
@@ -1156,8 +1160,10 @@ class PFD(Utilities.Utilities):
             # First compute profile stats.
             bins = [] 
             
-            for intensity in self.getprofile():# call to self.getprofile() returns profile scaled within the range [0,255].
-                bins.append(float(intensity))
+            #for intensity in self.getprofile():# call to self.getprofile() returns profile scaled within the range [0,255].
+            #    bins.append(float(intensity))
+            subbands = self.plot_subbands() #Profiles corrected for P and Pdot
+            bins = self.scale(subbands.sum(0))
             
             mn = mean(bins)
             stdev = std(bins)
