@@ -36,6 +36,7 @@ from numpy import sum
 from numpy import sqrt
 from numpy import std
 from numpy import arange
+from numpy import argmax
 from astropy.convolution import convolve, Box1DKernel
 
 # For plotting fits etc.
@@ -1283,7 +1284,8 @@ class PFD(Utilities.Utilities):
             
             #for intensity in self.getprofile():# call to self.getprofile() returns profile scaled within the range [0,255].
             #    bins.append(float(intensity))
-            subbands = self.plot_subbands() #Profiles corrected for P and Pdot
+            SNRs, DMs = self.fe.getDMSNRCurveData(self)
+            subbands = self.plot_subbands(dm=DMs[argmax(SNRs)]) #Profiles corrected for P and Pdot
             bins = self.scale(subbands.sum(0))
 
             
@@ -1305,13 +1307,12 @@ class PFD(Utilities.Utilities):
             self.features.append(kurt)
             
             # Now compute DM-SNR curve stats.
-            bins =[]
-            bins, empty = self.fe.getDMSNRCurveData(self)
+
             
-            mn = mean(bins)
-            stdev = std(bins)
-            skw = self.fe.skewness(bins)         
-            kurt = self.fe.excess_kurtosis(bins)
+            mn = mean(SNRs)
+            stdev = std(SNRs)
+            skw = self.fe.skewness(SNRs)
+            kurt = self.fe.excess_kurtosis(SNRs)
             
             if(self.debug==True):
                 print "\nFeature 5. Mean of the integrated SNR-DM Curve = ", str(mn)
@@ -1325,7 +1326,7 @@ class PFD(Utilities.Utilities):
             self.features.append(kurt)
 
             # subbands data
-            subbands = self.plot_subbands()
+            #subbands = self.plot_subbands()
             profile = subbands.sum(0)
             corrlist = self.fe.subband_correlation(subbands,profile)
 
@@ -1346,8 +1347,8 @@ class PFD(Utilities.Utilities):
             self.features.append(kurt)
 
             # Now compute Pdot-SNR curve stats.
-            chispd,pdots = self.plot_chi2_vs_pdot()
-            subints = self.plot_subints()
+            #chispd,pdots = self.plot_chi2_vs_pdot()
+            subints = self.plot_subints(dm=DMs[argmax(SNRs)])
             profile = subints.sum(0)
             corrlist = self.fe.subint_correlation(subints, profile)
 
@@ -1368,20 +1369,19 @@ class PFD(Utilities.Utilities):
             self.features.append(kurt)
 
             # try getting shape of DM-SNR curve
-            chi2, empty = self.fe.getDMSNRCurveData(self)
-            DMsize = arange(len(chi2))
-            shapemn = sum([x * y for x, y in zip(chi2, DMsize)]) / sum(chi2)
+            DMsize = arange(len(SNRs))
+            shapemn = sum([x * y for x, y in zip(SNRs, DMsize)]) / sum(SNRs)
             DMminusmn = DMsize - shapemn
-            shapevr = sum([x * y for x, y in zip(chi2, DMminusmn ** 2)]) / sum(chi2)
+            shapevr = sum([x * y for x, y in zip(SNRs, DMminusmn ** 2)]) / sum(SNRs)
             shapesd = sqrt(shapevr)
-            shapeskw = abs((sum([x * y for x, y in zip(chi2, DMminusmn ** 3)]) / sum(chi2)) / shapevr ** 1.5)
-            shapekurt = ((sum([x * y for x, y in zip(chi2, DMminusmn ** 4)]) / sum(chi2)) / shapevr ** 2) - 3
+            shapeskw = abs((sum([x * y for x, y in zip(SNRs, DMminusmn ** 3)]) / sum(SNRs)) / shapevr ** 1.5)
+            shapekurt = ((sum([x * y for x, y in zip(SNRs, DMminusmn ** 4)]) / sum(SNRs)) / shapevr ** 2) - 3
 
             if(self.debug==True):
-                print "\nFeature 17. Mean of the shape of DM-Chi2 plot = ",            str(shapemn)
-                print "Feature 18. Standard deviation of the shape of DM-Chi2 plot = ",str(shapesd)
-                print "Feature 19. Skewness of the shape of DM-Chi2 plot = ",          str(shapeskw)
-                print "Feature 20. Excess Kurtosis of the shape of DM-Chi2 plot = ",   str(shapekurt)
+                print "\nFeature 17. Mean of the shape of DM-SNR plot = ",            str(shapemn)
+                print "Feature 18. Standard deviation of the shape of DM-SNR plot = ",str(shapesd)
+                print "Feature 19. Skewness of the shape of DM-SNR plot = ",          str(shapeskw)
+                print "Feature 20. Excess Kurtosis of the shape of DM-SNR plot = ",   str(shapekurt)
 
 
             self.features.append(shapemn)
