@@ -4,6 +4,8 @@
 
 Author: Rob Lyon, School of Computer Science & Jodrell Bank Centre for Astrophysics,
 		University of Manchester, Kilburn Building, Oxford Road, Manchester M13 9PL.
+		Chia Min Tan, Jodrell Bank Centre for Astrophysics, University of Manchester,
+		Alan Turing Bulding, Oxford Road, Manchester M13 9PL.
 
 Contact:	rob@scienceguyrob.com or robert.lyon@postgrad.manchester.ac.uk
 Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
