@@ -471,7 +471,7 @@ class PFDFeatureExtractor(FeatureExtractor):
 
         for j in range(len(subbands)):
             if max(subbands[j]) - min(subbands[j]) > 0.05 * maxchange1:
-                coef1 = abs(corrcoef(subbands[j], profile))
+                coef1 = (corrcoef(subbands[j], profile))
                 corrlist1.append(coef1[0][1])
 
         return corrlist1
@@ -508,7 +508,7 @@ class PFDFeatureExtractor(FeatureExtractor):
 
         for j in range(len(subints)):
             if max(subints[j]) - min(subints[j]) > 0.05 * maxchange2:
-                coef2 = abs(corrcoef(subints[j], profile))
+                coef2 = (corrcoef(subints[j], profile))
                 corrlist2.append(coef2[0][1])
 
         return corrlist2
