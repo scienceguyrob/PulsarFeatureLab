@@ -360,6 +360,18 @@ class PFDFeatureExtractor(FeatureExtractor):
         yData = 255./max(yData)*yData
         
         return yData
+
+    def getDMSNRCurveData(self, data):
+        """
+        Extracts the DM curve data from the PFD file.
+
+        """
+
+        lodm = data.dms[0]
+        hidm = data.dms[-1]
+        y_values, dm_index = data.plot_SNR_vs_DM(lodm, hidm)
+
+        return (y_values, dm_index)
     
     # ****************************************************************************************************
     #

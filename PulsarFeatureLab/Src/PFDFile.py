@@ -27,7 +27,6 @@ from numpy import fabs
 from numpy import fromfile
 from numpy import reshape
 from numpy import float64
-from numpy import arange
 from numpy import add
 from numpy import mean
 from numpy import zeros
@@ -37,6 +36,7 @@ from numpy import sum
 from numpy import sqrt
 from numpy import std
 from numpy import arange
+from astropy.convolution import convolve, Box1DKernel
 
 # For plotting fits etc.
 import matplotlib.pyplot as plt
@@ -426,6 +426,58 @@ class PFD(Utilities.Utilities):
 
         return (chis, DMs)
 
+    # ******************************************************************************************
+
+    def plot_SNR_vs_DM(self, loDM, hiDM, N=100, interp=0):
+        """
+        Plot (and return) an array showing the SNR versus DM
+        (N DMs spanning loDM-hiDM). Use sinc_interpolation if 'interp' is non-zero.
+        SNR is calculated using covolution of boxcar of various size to find the best
+        boxcar size that covers the whole on pulse region
+        """
+
+        # Sum the profiles in time
+        # sumprofs = self.profs.sum(0)
+        sumprofs, empty = self.adjust_period_get()  # corrected for P and Pdot
+
+        if not interp:
+            profs = sumprofs
+        else:
+            profs = zeros(shape(sumprofs), dtype='d')
+
+        DMs = self.fe.span(loDM, hiDM, N)
+        SNRplot = zeros(N, dtype='f')
+        subdelays_bins = self.subdelays_bins.copy()
+
+        for ii, DM in enumerate(DMs):
+
+            subdelays = self.fe.delay_from_DM(DM, self.barysubfreqs)
+            hifreqdelay = subdelays[-1]
+            subdelays = subdelays - hifreqdelay
+            delaybins = subdelays * self.binspersec - subdelays_bins
+
+            if interp:
+
+                interp_factor = 16
+                for jj in range(self.nsub):
+                    profs[jj] = self.fe.interp_rotate(sumprofs[jj], delaybins[jj], zoomfact=interp_factor)
+                # Note: Since the interpolation process slightly changes the values of the
+                # profs, we need to re-calculate the average profile value
+                avgprof = (profs / self.proflen).sum()
+
+            else:
+
+                new_subdelays_bins = floor(delaybins + 0.5)
+                for jj in range(self.nsub):
+                    profs[jj] = self.fe.rotate(profs[jj], int(new_subdelays_bins[jj]))
+                subdelays_bins += new_subdelays_bins
+                avgprof = (profs / self.proflen).sum()
+
+            sumprof = profs.sum(0)
+            SNRplot[ii] = self.calc_SNR(prof=sumprof)
+
+        return (SNRplot, DMs)
+
     # ****************************************************************************************************
 
     def p_to_f(self, p, pd, pdd=None):
@@ -761,6 +813,39 @@ class PFD(Utilities.Utilities):
         if avg is None:  avg = self.avgprof
         if var is None:  var = self.varprof
         return ((prof-avg)**2.0/var).sum()/self.DOFcor #(len(prof)-1.0)   this is new way
+
+    # ******************************************************************************************
+
+    def calc_SNR(self, prof=None, var=None):
+        """
+        Return the calculated SNR of the current summed profile. This uses a moving boxcar
+        window to determine the size of the on-pulse region to calculate the SNR value of the
+        profile
+        """
+
+        if prof is None: prof = self.sumprof
+        if var is None: var = self.varprof
+        if self.proflen == 100:
+            halfwidthset = [1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40]
+        elif self.proflen == 50:
+            halfwidthset = [1, 2, 3, 4, 6, 8, 10, 12, 16, 20]
+        elif self.proflen == 64:
+            halfwidthset = [1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28]
+
+        bestSNR = 0.0
+        for i in range(len(halfwidthset)):
+            width = 1 + 2 * halfwidthset[i]
+            baseline_halfwidth = ((self.proflen - width) - 1) / 2
+            baseline_width = 1 + 2 * baseline_halfwidth
+            baseline = (convolve(prof, Box1DKernel(baseline_width), boundary='wrap'))
+            redprof = prof - min(baseline)
+            peak = convolve(redprof, Box1DKernel(width), boundary='wrap')
+            SNR = max(peak) * sqrt(self.proflen / self.DOFcor) / sqrt(var) * sqrt(
+                width * (self.proflen - width) / self.proflen)
+            if SNR > bestSNR:
+                bestSNR = SNR
+
+        return bestSNR
     
     # ******************************************************************************************
     
@@ -1221,7 +1306,7 @@ class PFD(Utilities.Utilities):
             
             # Now compute DM-SNR curve stats.
             bins =[]
-            bins = self.fe.getDMCurveData(self)
+            bins, empty = self.fe.getDMSNRCurveData(self)
             
             mn = mean(bins)
             stdev = std(bins)
@@ -1282,8 +1367,8 @@ class PFD(Utilities.Utilities):
             self.features.append(skw)
             self.features.append(kurt)
 
-            # try getting shape of DM curve
-            chi2 = self.fe.getDMCurveData(self)
+            # try getting shape of DM-SNR curve
+            chi2, empty = self.fe.getDMSNRCurveData(self)
             DMsize = arange(len(chi2))
             shapemn = sum([x * y for x, y in zip(chi2, DMsize)]) / sum(chi2)
             DMminusmn = DMsize - shapemn
