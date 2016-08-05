@@ -453,16 +453,6 @@ class PFDFeatureExtractor(FeatureExtractor):
         corrlist1 = []
         maxmin1 = []
 
-
-        # scrunch subband from 288 to 36 (LOTAAS specific data)
-        scrunchsubbands = []
-        if len(subbands) == 288:
-            for j in range(36):
-                scrunchsubbands.append(
-                    subbands[(j * 8) + 0] + subbands[(j * 8) + 1] + subbands[(j * 8) + 2] + subbands[(j * 8) + 3] +
-                    subbands[(j * 8) + 4] + subbands[(j * 8) + 5] + subbands[(j * 8) + 6] + subbands[(j * 8) + 7])
-            subbands = scrunchsubbands
-
         # remove empty subbands and calculate the coefficients
         for j in range(len(subbands)):
             maxmin1.append(max(subbands[j]) - min(subbands[j]))
@@ -492,13 +482,6 @@ class PFDFeatureExtractor(FeatureExtractor):
         """
         corrlist2 = []
         maxmin2 = []
-
-        # scrunch subints so that its consistent
-        scrunchsubints = []
-        if len(subints) == 120:
-            for j in range(40):
-                scrunchsubints.append(subints[(j * 3) + 0] + subints[(j * 3) + 1] + subints[(j * 3) + 2])
-            subints = scrunchsubints
 
         # remove empty subints
         for j in range(len(subints)):
