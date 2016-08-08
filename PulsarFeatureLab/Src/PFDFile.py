@@ -1253,9 +1253,9 @@ class PFD(Utilities.Utilities):
         Feature 2. Standard deviation of the integrated (folded) pulse profile.
         Feature 3. Skewness of the integrated (folded) pulse profile.
         Feature 4. Excess kurtosis of the integrated (folded) pulse profile.
-        Feature 5. Mean of the DM-chi2 curve.
-        Feature 6. Standard deviation of the DM-chi2 curve.
-        Feature 7. Skewness of the DM-chi2 curve.
+        Feature 5. Mean of the DM-SNR curve.
+        Feature 6. Standard deviation of the DM-SNR curve.
+        Feature 7. Skewness of the DM-SNR curve.
         Feature 8. Excess kurtosis of the DM-chi2 curve.
         Feature 9. Mean of the correlation coefficient between each subband and pulse profile.
         Feature 10. Standard deviation of the correlation coefficient between each subband and pulse profile.
@@ -1265,10 +1265,10 @@ class PFD(Utilities.Utilities):
         Feature 14. Standard deviation of the correlation coefficient between each subband and pulse profile.
         Feature 15. Skewness of the correlation coefficient between each subband and pulse profile.
         Feature 16. Excess kurtosis of the correlation coefficient between each subband and pulse profile.
-        Feature 17. Mean of the shape of the DM-chi2 curve.
-        Feature 18. Standard deviation of the shape of the DM-chi2 curve.
-        Feature 19. Skewness of the shape of the DM-chi2 curve.
-        Feature 20. Excess kurtosis of the shape of the DM-chi2 curve.
+        Feature 17. Mean of the shape of the DM-SNR curve.
+        Feature 18. Standard deviation of the shape of the DM-SNR curve.
+        Feature 19. Skewness of the shape of the DM-SNR curve.
+        Feature 20. Excess kurtosis of the shape of the DM-SNR curve.
         
         Parameters:
         N/A
@@ -1378,10 +1378,10 @@ class PFD(Utilities.Utilities):
             shapekurt = ((sum([x * y for x, y in zip(chi2, DMminusmn ** 4)]) / sum(chi2)) / shapevr ** 2) - 3
 
             if(self.debug==True):
-                print "\nFeature 17. Mean of the shape of DM-Chi2 plot = ",            str(shapemn)
-                print "Feature 18. Standard deviation of the shape of DM-Chi2 plot = ",str(shapesd)
-                print "Feature 19. Skewness of the shape of DM-Chi2 plot = ",          str(shapeskw)
-                print "Feature 20. Excess Kurtosis of the shape of DM-Chi2 plot = ",   str(shapekurt)
+                print "\nFeature 17. Mean of the shape of DM-SNR plot = ",            str(shapemn)
+                print "Feature 18. Standard deviation of the shape of DM-SNR plot = ",str(shapesd)
+                print "Feature 19. Skewness of the shape of DM-SNR plot = ",          str(shapeskw)
+                print "Feature 20. Excess Kurtosis of the shape of DM-SNR plot = ",   str(shapekurt)
 
 
             self.features.append(shapemn)
@@ -1394,7 +1394,7 @@ class PFD(Utilities.Utilities):
             print self.format_exception(e)
             raise Exception("Exception computing 8 features from Lyon et al.,2015 + "
                             "8 features from the correlation coefficient between subbands and subints with pulse profile + "
-                            "4 new features from the DM-Chi2 plot")
+                            "4 new features from the DM-SNR plot")
         
         return self.features
 
