@@ -258,7 +258,7 @@ class PulsarFeatureLab:
                 for count in range(1,7):
                     utils.appendToFile(self.out, "@attribute Feature_"+ str(count)+" numeric\n")
             elif(self.feature_type == 6):
-                for count in range(1,17):
+                for count in range(1,21):
                     utils.appendToFile(self.out, "@attribute Feature_"+ str(count)+" numeric\n")
             elif(self.feature_type == 7 or self.feature_type == 8):
                 print "\t NOTE:"
