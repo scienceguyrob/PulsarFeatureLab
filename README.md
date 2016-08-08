@@ -1,6 +1,6 @@
 ******************************************************************************************
 
-# PulsarFeatureLab V1.2.1
+# PulsarFeatureLab V1.2
 
 Author: Rob Lyon, School of Computer Science & Jodrell Bank Centre for Astrophysics,
 		University of Manchester, Kilburn Building, Oxford Road, Manchester M13 9PL.
