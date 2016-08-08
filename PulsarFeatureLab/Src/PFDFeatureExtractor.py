@@ -505,7 +505,7 @@ class PFDFeatureExtractor(FeatureExtractor):
         corrlist2 = []
         maxmin2 = []
 
-        # scrunch subints so that its consistent
+        # scrunch subints so that its consistent (LOTAAS specific data)
         scrunchsubints = []
         if len(subints) == 120:
             for j in range(40):
