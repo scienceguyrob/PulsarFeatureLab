@@ -173,3 +173,15 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
 	[6] V. Morello et al., "SPINN: a straightforward machine learning solution to the pulsar candidate
 		selection problem", Monthly Notices of the Royal Astronomical Society, vol. 443, no. 2,
 		pp. 1651-1662, 2014.
+
+7. Changes from master version
+
+    V1.1   - Added new scores from the period against chi2 and pdot against chi2 plots (only available in PFD data)
+             for the Lyon et al feature set.
+    V1.2   - Removed the scores from the period against chi2 and pdot against chi2 plots and added new scores from
+             the correlation coefficients between each subband and the pulse profile and between each subint and
+             the pulse profile, as well as new scores to measure the shape of the DM against chi2 plots for the
+             Lyon et al feature set.
+    V1.2.1 - Introduced a degree of freedom correction to the DM against chi2 plot.
+    V1.2.2 - Optimised the PFD data to the best period and pdot values found during the searching process instead
+             of using the folded values.
