@@ -173,3 +173,8 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
 	[6] V. Morello et al., "SPINN: a straightforward machine learning solution to the pulsar candidate
 		selection problem", Monthly Notices of the Royal Astronomical Society, vol. 443, no. 2,
 		pp. 1651-1662, 2014.
+
+7. Changes from master version
+
+    V1.1 - Added new scores from the period against chi2 and pdot against chi2 plots (only available in PFD data)
+           for the Lyon et al feature set.
