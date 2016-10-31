@@ -18,6 +18,7 @@
 # Custom Imports
 import PHCXFile as phcx
 import PFDFile as pfd
+import PHCXSKASAFile as phcxskasa
 
 # ****************************************************************************************************
 #
@@ -112,6 +113,7 @@ class Candidate:
                                                  pipeline described by Thornton., PhD Thesis, Univ. Manchester, 2013.
                                 candidate_type = 3 assumes PFD files output by the LOTAAS and similar surveys in the
                                                  presto PFD format.
+                                candidate_type = 4 assumes PHCX candidates output by the SKA SA pipeline.
                                                                          
         verbose            -    the verbose logging flag.
         
@@ -136,7 +138,13 @@ class Candidate:
             c = phcx.PHCX(verbose,self.candidateName,profileIndex)
             self.features = c.computeFeatures(feature_type)
             return self.features
-        
+
+        elif(".phcx" in self.candidateName and candidate_type == 4):
+            profileIndex = 0 # For xml file, read comments above.
+            c = phcxskasa.PHCXSKASA(verbose,self.candidateName,profileIndex)
+            self.features = c.computeFeatures(feature_type)
+            return self.features
+
         else:
             raise Exception("Unknown candidate type: Candidate.py (Line 136).")
     

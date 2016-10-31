@@ -545,6 +545,14 @@ class PHCXFeatureExtractor(FeatureExtractor):
         
         # Extract DM curve.
         dm_curve_all = array(self.getDM_FFT(data,section))
+
+        if(self.debug):
+
+            print '\tDM Curve bins: ', len(dm_curve_all)
+            plt.plot(dm_curve_all)
+            plt.title("DM Curve")
+            plt.show()
+
         return dm_curve_all
     
     # ****************************************************************************************************

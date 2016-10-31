@@ -45,6 +45,8 @@
     |        described by Thornton., PhD Thesis, Univ. Manchester, 2013.     |
     |    3 - The PFD files output by the LOTAAS and similar surveys in the   |
     |        presto PFD format.                                              |
+    |    4 - The PHCX candidates output by the pipeline written by Monika    |
+    |        Obrocka, and the tam at SKA SA.                                 |
     |                                                                        |
     **************************************************************************
     | Optional Command Line Arguments:                                       |
@@ -178,12 +180,12 @@ class PulsarFeatureLab:
             sys.exit()
         
         # Process -c argument if provided. 
-        if(self.candidate_type < 1 or self.candidate_type > 3):
+        if(self.candidate_type < 1 or self.candidate_type > 4):
             print "You must indicate the type of candidate file features will be extracted from with the -c flag."
             print "1    -    The PHCX candidates produced by pipeline described 'SPINN: a straightforward machine learning solution to the pulsar candidate selection problem', Morello et al., MNRAS 443, 2, 2014."
             print "2    -    The gnuzipped ('.gz') PHCX candidates produced by pipeline described in 'The High Time Resolution Radio Sky', Thornton., PhD Thesis, Univ. Manchester, 2013."
             print "3    -    The PFD files output by the LOTAAS and similar surveys (presto PFD format)."
-            
+            print "4    -    The PHCX files output by the SKA SA Pipelines (PHCX format)."
             sys.exit()
         
         # Process --arff argument if provided.

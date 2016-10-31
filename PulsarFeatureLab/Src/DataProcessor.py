@@ -133,6 +133,7 @@ class DataProcessor(Utilities.Utilities):
                                                  pipeline described by Thornton., PhD Thesis, Univ. Manchester, 2013.
                                 candidate_type = 3 assumes PFD files output by the LOTAAS and similar surveys in the
                                                  presto PFD format.
+                                candidate_type = 4 assumes PHCX candidates output by the SKA SA pipeline.
                                                  
         verbose            -    debug logging flag, if true output statements will be verbose.
         meta               -    a flag that when set to true, indicates that meta information will be retained
@@ -166,6 +167,9 @@ class DataProcessor(Utilities.Utilities):
         elif(candidate_type == 3):
             print "\tSearching for candidates with file extension: ", self.pfdRegex
             fileTypeRegexes = [self.pfdRegex]
+        elif(candidate_type == 4):
+            print "\tSearching for candidates with file extension: ", self.phcxRegex
+            fileTypeRegexes = [self.phcxRegex]
         else:
             print "\tNo candidate file type provided, exiting..."
             sys.exit()
