@@ -124,7 +124,12 @@ class Candidate:
             c = pfd.PFD(verbose,self.candidateName)
             self.features = c.computeFeatures(feature_type)
             return self.features
-        
+
+        elif (".pfd.36scrunch" in self.candidateName and candidate_type == 3):
+            c = pfd.PFD(verbose, self.candidateName)
+            self.features = c.computeFeatures(feature_type)
+            return self.features
+
         elif(".phcx.gz" in self.candidateName and candidate_type == 2):
             profileIndex = 1 # For xml file, read comments above.
             c = phcx.PHCX(verbose,self.candidateName,profileIndex)

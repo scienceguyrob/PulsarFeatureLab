@@ -54,7 +54,8 @@ class DataProcessor(Utilities.Utilities):
         self.utils = Utilities.Utilities.__init__(self,debugFlag)
         self.gzPhcxRegex = "*.phcx.gz"   
         self.phcxRegex    = "*.phcx" 
-        self.pfdRegex     = "*.pfd"   
+        self.pfdRegex     = "*.pfd"
+        self.scrunchedPfdRegex = "*.pfd.36scrunch"
         self.featureStore   = []     # Variable which stores the features created for a candidate.
         
     # ****************************************************************************************************
@@ -164,8 +165,8 @@ class DataProcessor(Utilities.Utilities):
             print "\tSearching for candidates with file extension: ", self.gzPhcxRegex
             fileTypeRegexes = [self.gzPhcxRegex]
         elif(candidate_type == 3):
-            print "\tSearching for candidates with file extension: ", self.pfdRegex
-            fileTypeRegexes = [self.pfdRegex]
+            print "\tSearching for candidates with file extension: ", self.pfdRegex, " and ", self.scrunchedPfdRegex
+            fileTypeRegexes = [self.pfdRegex, self.scrunchedPfdRegex]
         else:
             print "\tNo candidate file type provided, exiting..."
             sys.exit()

@@ -595,7 +595,7 @@ class PFDFeatureExtractor(FeatureExtractor):
         if bins==0:
             return arr
         else:
-            return Num.concatenate((arr[bins:], arr[:bins]))
+            return Num.concatenate((arr[int(bins):], arr[:int(bins)]))
     
     # ****************************************************************************************************
     
