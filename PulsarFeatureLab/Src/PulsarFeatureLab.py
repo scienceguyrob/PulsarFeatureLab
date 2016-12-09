@@ -161,7 +161,7 @@ class PulsarFeatureLab:
             
             # Now check again if it exists.
             if(not utils.fileExists(self.out)):
-                print "You must supply a valid output file path with the -d flag."
+                print "You must supply a valid output file path with the -f flag."
                 sys.exit()
                 
             
