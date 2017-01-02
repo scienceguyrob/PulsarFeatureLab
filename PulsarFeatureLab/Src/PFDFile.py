@@ -1408,9 +1408,12 @@ class PFD(Utilities.Utilities):
         Returns:
         An array of data.
         """
-        
-        for intensity in self.profile:
-            self.features.append(float(intensity))
+
+        SNRs, DMs = self.fe.getDMSNRCurveData(self)
+        subbands = self.plot_subbands(dm=DMs[argmax(SNRs)])  # Profiles corrected for P and Pdot
+        bins = self.scale(subbands.sum(0))
+
+        self.features.append(bins)
 
             
         return self.features
@@ -1426,10 +1429,10 @@ class PFD(Utilities.Utilities):
         Returns:
         An array of data.
         """
-        
-        curve = self.fe.getDMCurveData(self)
+
+        SNRs, DMs = self.fe.getDMSNRCurveData(self)
             
-        return curve   
+        return SNRs
     
     # ******************************************************************************************
     
