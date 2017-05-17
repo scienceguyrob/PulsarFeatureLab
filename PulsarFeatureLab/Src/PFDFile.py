@@ -1413,10 +1413,10 @@ class PFD(Utilities.Utilities):
         subbands = self.plot_subbands(dm=DMs[argmax(SNRs)])  # Profiles corrected for P and Pdot
         bins = self.scale(subbands.sum(0))
 
-        self.features.append(bins)
+        #self.features.append(bins)
 
             
-        return self.features
+        return bins
         
     # ****************************************************************************************************
     
