@@ -466,14 +466,26 @@ class PFDFeatureExtractor(FeatureExtractor):
         maxmin1 = []
 
 
-        # scrunch subband from 288 to 36 (LOTAAS specific data)
+        # Scrunch subband from to 36, 32, 40 or 30 depending on data in order of preference
+        # I hope there are no data with less than 30 subbands
         scrunchsubbands = []
-        if len(subbands) == 288:
-            for j in range(36):
-                scrunchsubbands.append(
-                    subbands[(j * 8) + 0] + subbands[(j * 8) + 1] + subbands[(j * 8) + 2] + subbands[(j * 8) + 3] +
-                    subbands[(j * 8) + 4] + subbands[(j * 8) + 5] + subbands[(j * 8) + 6] + subbands[(j * 8) + 7])
-            subbands = scrunchsubbands
+        noofsubbands = [36,32,40,30]
+        remainder = []
+        for i in range(len(noofsubbands)):
+            remainder.append(len(subbands)%noofsubbands[i])
+
+        scrunchfactor=len(subbands)/noofsubbands[Num.argmin(remainder)]
+        for i in range(noofsubbands[Num.argmin(remainder)]):
+            scrunchsubbands.append(Num.sum(subbands[(i*scrunchfactor):(i*scrunchfactor)+scrunchfactor],axis=0))
+        subbands = scrunchsubbands
+        
+        #defunct LOTAAS exclusive scrunching
+        #if len(subbands) == 288:
+        #    for j in range(36):
+        #        scrunchsubbands.append(
+        #            subbands[(j * 8) + 0] + subbands[(j * 8) + 1] + subbands[(j * 8) + 2] + subbands[(j * 8) + 3] +
+        #            subbands[(j * 8) + 4] + subbands[(j * 8) + 5] + subbands[(j * 8) + 6] + subbands[(j * 8) + 7])
+        #    subbands = scrunchsubbands
 
         # remove empty subbands and calculate the coefficients
         for j in range(len(subbands)):
@@ -505,11 +517,20 @@ class PFDFeatureExtractor(FeatureExtractor):
         corrlist2 = []
         maxmin2 = []
 
-        # scrunch subints so that its consistent (LOTAAS specific data)
-        scrunchsubints = []
-        if len(subints) == 120:
-            for j in range(40):
-                scrunchsubints.append(subints[(j * 3) + 0] + subints[(j * 3) + 1] + subints[(j * 3) + 2])
+        # scrunch subints to 36, 32, 40 or 30 in order of preference for more than 30 subints
+
+        if len(subints) >= 30:
+            scrunchsubints = []
+            
+            noofsubints = [36,32,40,30]
+            remainder = []
+            for i in range(len(noofsubints)):
+                remainder.append(len(subints)%noofsubints[i])
+            scrunchfactor=len(subints)/noofsubints[Num.argmin(remainder)]
+  
+            for j in range(noofsubints[Num.argmin(remainder)]):
+                scrunchsubints.append(Num.sum(subints[(j*scrunchfactor):(j*scrunchfactor)+scrunchfactor],axis=0))
+        
             subints = scrunchsubints
 
         # remove empty subints
