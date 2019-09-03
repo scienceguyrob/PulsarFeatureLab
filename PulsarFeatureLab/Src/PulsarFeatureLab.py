@@ -1,7 +1,7 @@
 """
     **************************************************************************
     |                                                                        |
-    |                     Pulsar Feature Lab Version 1.3.1                   |
+    |                     Pulsar Feature Lab Version 1.3.2                   |
     |                                                                        |
     **************************************************************************
     | Description:                                                           |
@@ -14,7 +14,7 @@
     | If you find this code useful, and use it as part of your research      |
     | please use the following citation:                                     |
     |                                                                        |
-    | Lyon et al., MNRAS, 000, 1, 2015.                                      |
+    | Lyon et al., MNRAS, 459, 1104, 2016.                                   |
     **************************************************************************
     | Author: Rob Lyon                                                       |
     | Email : robert.lyon@postgrad.manchester.ac.uk                          |
@@ -33,28 +33,19 @@
     |    3 - 22 features from Thornton., PhD Thesis, Univ. Manchester, 2013. |
     |    4 - 6 features from  Lee et al., MNRAS 433, 1, 2013.                |
     |    5 - 6 features from Morello et al., MNRAS 443, 2, 2014.             |
-    |    6 - 8 features from Lyon et al., MNRAS, 000, 0, 2015 + 12 new       |
-    |          features developed by Tan et. al. these include:              |
-    |          i. Mean of the correlation coefficient between each subband   |
-    |             and pulse profile.                                         |
-    |          ii.Standard deviation of the correlation coefficient between  |
-    |             each subband and pulse profile.                            |
-    |         iii. Skewness of the correlation coefficient between each      |
-    |              subband and pulse profile.                                |
-    |          iv. Excess kurtosis of the correlation coefficient between    |
-    |              each subband and pulse profile.                           |
-    |           v. Mean of the correlation coefficient between each subband  |
+    |    6 - 8 features from Lyon et al., MNRAS, 459, 1104, 2016 + 12 new    |
+    |        features developed by Tan et. al., MNRAS, 474, 4571, 2018.      |
+    |        These include the Mean, Standard deviation, Skewness and Excess |
+    |        kurtosis of:                                                    |
+    |          i. Pulse profile                                              |
+    |         ii. DM-S/N curve                                               |
+    |        iii. Correlation coefficient between each subband and the       |
+    |             pulse profile.                                             |
+    |         iv. Correlation coefficient between each subint and the pulse  |
+    |             profile.                                                   |
+    |          v. Shape of the DM-S/N curve.                                 |
     |              and pulse profile.                                        |
-    |          vi. Standard deviation of the correlation coefficient between |
-    |              each subband and pulse profile.                           |
-    |         vii. Skewness of the correlation coefficient between each      |
-    |              subband and pulse profile.                                |
-    |        viii. Excess kurtosis of the correlation coefficient between    |
-    |              each subband and pulse profile.                           |
-    |          ix. Mean of the shape of the DM-SNR curve.                    |
-    |           x. Standard deviation of the shape of the DM-SNR curve.      |
-    |          xi. Skewness of the shape of the DM-SNR curve.                |
-    |         xii. Excess kurtosis of the shape of the DM-SNR curve.         |
+    |        Note : Currently only working on presto PFD files.              |
     |                                                                        |
     |    7 - Raw integrated (folded) profile data.                           |
     |    8 - Raw DM-SNR Curve data.                                          |
