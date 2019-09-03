@@ -1,6 +1,6 @@
 ******************************************************************************************
 
-# PulsarFeatureLab V1.3.1
+# PulsarFeatureLab V1.3.2
 
 Author: Rob Lyon, School of Computer Science & Jodrell Bank Centre for Astrophysics,
 		University of Manchester, Kilburn Building, Oxford Road, Manchester M13 9PL.
@@ -98,7 +98,7 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
     	<li>22 features from Thornton. [4].</li>
     	<li>6 features from Lee et al. [5].</li>
     	<li>6 features from Morello et al. [6].</li>
-    	<li>8 features from Lyon et al. [1].</li>
+    	<li>20 features from Lyon et al. [1] and Tan et al. [7].</li>
     	<li>Integrated (folded) profile data.</li>
     	<li>DM-SNR Curve data.</li>
     </ol>
@@ -135,13 +135,13 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
 
 	Please use the following citation if you make use of tool:
 	
-	@article{Lyon:2015:bs,
+	@article{Lyon:2016:bs,
 	author    = {{Lyon}, R.~J. and {Stappers}, B.~W. and {Cooper}, S. and {Brooke}, J.~M. {Knowles}, J.~D.},
 	title     = {{Fifty Years of Pulsar Candidate Selection: From simple filters to a new principled real-time classification approach}},
 	journal   = {MNRAS},
-	volume    = {000},
-	year      = {2015},
-	pages     = {000-000}
+	volume    = {459},
+	year      = {2016},
+	pages     = {1104}
 	}
 	
 4. Acknowledgements
@@ -153,8 +153,8 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
 6. References
 
 	[1] R. J. Lyon et al., "Fifty Years of Pulsar Candidate Selection: From simple filters to a new
-		principled real-time classification approach", Submitted to Monthly Notices of the Royal 
-		Astronomical Society.
+		principled real-time classification approach", Monthly Notices of the Royal Astronomical Society,
+                vol 459, p. 1104, 2016.
 		
 	[2] R. P. Eatough et al., "Selection of radio pulsar candidates using artificial neural networks",
 		Monthly Notices of the Royal Astronomical Society, vol. 407, no. 4, pp. 2443-2450, 2010.
@@ -174,20 +174,32 @@ Web:		http://www.scienceguyrob.com or http://www.cs.manchester.ac.uk
 		selection problem", Monthly Notices of the Royal Astronomical Society, vol. 443, no. 2,
 		pp. 1651-1662, 2014.
 
+        [7] C. M. Tan et al., "Ensemble candidate classification for the LOTAAS pulsar survey", Monthly Notices of 
+                the Royal Astronomical Society, vol. 474, no. 4, pp. 4571-4583, 2018
+
 7. Changes from master version
 
     V1.1   - Added new scores from the period against chi2 and pdot against chi2 plots (only available in PFD data)
              for the Lyon et al feature set.
+
     V1.2   - Removed the scores from the period against chi2 and pdot against chi2 plots and added new scores from
              the correlation coefficients between each subband and the pulse profile and between each subint and
              the pulse profile, as well as new scores to measure the shape of the DM against chi2 plots for the
              Lyon et al feature set.
+
     V1.2.1 - Introduced a degree of freedom correction to the DM against chi2 plot.
+
     V1.2.2 - Optimised the PFD data to the best period and pdot values found during the searching process instead
              of using the folded values.
+
     V1.2.3 - Added a check to ensure the number of subbands and number of subint in each PFD data are the same.
              (currently only work with LOTAAS data)
+
     V1.3   - Introduced a new method to calculate the signal to noise ratio (SNR) of the pulse profile using boxcar
              convolution of various size to search for the on-pulse region of the profile. The DM against chi2
              plot is replaced by the DM against SNR plot while calculating the scores.
+
     V1.3.1 - The actual values of subband/subint correlation coefficients are used instead of the absolute values.
+
+    V1.3.2 - The subband/subint correlation coefficient features now first scrunch the data into either 36, 32, 40 
+             or 30 subbands/subints before generating the feature scores.
